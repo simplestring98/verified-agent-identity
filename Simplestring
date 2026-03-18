@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       agent_name:
-        description: 'Agent Name'
+        description: 'Simplestring'
         required: true
         default: 'Simplestring'
       agent_description:
-        description: 'Agent Description'
+        description: 'Simplestring'
         required: true
         default: 'Simplestring AI Agent'
 
@@ -17,38 +17,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2. Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # 3. Clean environment (PENTING)
-      - name: Clean cache & identity
-        run: |
-          npm cache clean --force
-          rm -rf ~/.openclaw
+      - name: Step 1 - Install ClawHub skill
+        run: npx clawhub@latest install verified-agent-identity
 
-      # 4. Install ClawHub skill (FORCE)
-      - name: Install ClawHub identity skill
-        run: npx clawhub@latest install verified-agent-identity --force
-
-      # 5. Install dependencies script
       - name: Install script dependencies
         run: |
           cd scripts
           npm install
 
-      # 6. Create Ethereum Identity
-      - name: Create new Ethereum Identity
+      - name: Step 2 - Create new Ethereum Identity
         run: node scripts/createNewEthereumIdentity.js
 
-      # 7. Link Human → Agent (pakai input dynamic)
-      - name: Link Human to Agent
+      - name: Step 3 - Link Human to Agent
         run: |
-          node scripts/manualLinkHumanToAgent.js \
-          --challenge "{\"name\": \"${{ github.event.inputs.agent_name }}\", \"description\": \"${{ github.event.inputs.agent_description }}\"}"
+          node scripts/manualLinkHumanToAgent.js --challenge '{"name": "Simplestring", "description": "Simplestring AI Agent"}'
